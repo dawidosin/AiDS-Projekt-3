@@ -1,17 +1,27 @@
+#pragma once
 #include <vector>
+#include <string>
+#include <memory>
+#include <utility>
+#include <expected>
 
 class Graph {
-   std::vector<std::vector<int>> vec;
-
 public:
-    Graph(int n)
-    {
-        vec = std::vector<std::vector<int>>(n, std::vector<int>(n, 0));
-    }
+    enum Type {matrix, list, table};
 
-    void add_edge(int u, int v)
-    {
-        vec[u][v] = 1;
-        vec[v][u] = 1;
-    }
+    virtual ~Graph() = default;
+    virtual void print() const = 0;
+    virtual void addEdge(int from, int to) = 0;
+    virtual bool hasEdge(int from, int to) const = 0;   
+    virtual std::vector<int> bfs(int start) const = 0;
+    virtual std::vector<int> dfs(int start) const = 0;
+    virtual std::vector<int> getNeighbors(int node) const = 0;
+    virtual int getNodeCount() const = 0;
+    virtual std::vector<std::pair<int, int>> getEdges() const = 0;
+
+    std::vector<int> kahnTopologicalSort() const;
+    std::vector<int> tarjanTopologicalSort() const;
+
+    static std::unique_ptr<Graph> createGraph(const Type type, int nodes, const std::vector<std::vector<int>>& adj);
+    static std::unique_ptr<Graph> generateDAG(int nodes, int saturation, Type type = Type::list);
 };
