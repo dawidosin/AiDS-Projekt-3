@@ -1,4 +1,5 @@
 #include "gui.h"
+#include "graph.h"
 #include "adjacencylist.h"
 #include <iostream>
 #include <sstream>
@@ -10,7 +11,6 @@ void HELP::Modes(char* argv[]) {
     std::cerr << "Usage options:\n";
     std::cerr << "  " << argv[0] << " --generate       Generate a random acyclic graph\n";
     std::cerr << "  " << argv[0] << " --user-provided  Provide your own graph values\n";
-    std::cerr << "  " << argv[0] << "                 Interactive mode\n";
 }
 
 void HELP::Generate(char* argv[]) {
@@ -32,6 +32,17 @@ void HELP::Action(char* argv[]) {
 
 std::expected<std::unique_ptr<Graph>, std::string> GUI::getGenerate() {
     int nodes, saturation;
+    Graph::Type type;
+
+    std::string input;
+    std::cout << "type> ";
+    std::cin >> input;
+    if (input == "list") type = Graph::Type::list;
+    else if (input == "matrix") type = Graph::Type::matrix;
+    else if (input == "table") type = Graph::Type::table;
+    else {
+        return std::unexpected("Invalid graph type");
+    }
     
     std::cout << "nodes> ";
     if (!(std::cin >> nodes) || nodes < 1 || nodes > 100) {
@@ -44,7 +55,7 @@ std::expected<std::unique_ptr<Graph>, std::string> GUI::getGenerate() {
     }
 
     try {
-        return Graph::generateDAG(nodes, saturation);
+        return Graph::generateDAG(nodes, saturation, type);
     } catch (const std::exception& e) {
         return std::unexpected(std::string("Graph generation failed: ") + e.what());
     }
@@ -82,15 +93,15 @@ std::expected<void, std::string> GUI::getAction(std::unique_ptr<Graph>& graph) {
     std::string input;
     std::cout << "action> ";
     std::getline(std::cin >> std::ws, input);
-
+    
     std::istringstream iss(input);
     std::string command;
     iss >> command;
 
-    if (command == "Print") {
+    if (input == "Print") {
         graph->print();
     }
-    else if (command == "BFS") {
+    else if (input == "Breath-first search") {
         int start;
         if (!(iss >> start)) {
             return std::unexpected("Missing start node for BFS");
@@ -100,7 +111,7 @@ std::expected<void, std::string> GUI::getAction(std::unique_ptr<Graph>& graph) {
         for (int node : result) std::cout << node << " ";
         std::cout << "\n";
     }
-    else if (command == "DFS") {
+    else if (input == "Depth-first search") {
         int start;
         if (!(iss >> start)) {
             return std::unexpected("Missing start node for DFS");
@@ -110,7 +121,7 @@ std::expected<void, std::string> GUI::getAction(std::unique_ptr<Graph>& graph) {
         for (int node : result) std::cout << node << " ";
         std::cout << "\n";
     }
-    else if (command == "Find") {
+    else if (input == "Find") {
         int from, to;
         if (!(iss >> from >> to)) {
             return std::unexpected("Missing nodes for Find");
@@ -118,7 +129,7 @@ std::expected<void, std::string> GUI::getAction(std::unique_ptr<Graph>& graph) {
         std::cout << "Edge " << from << "->" << to << " " 
                   << (graph->hasEdge(from, to) ? "exists" : "does not exist") << "\n";
     }
-    else if (command == "TopoSort") {
+    else if (input == "TopoSort") {
         std::string method;
         iss >> method;
         std::vector<int> result;
@@ -137,10 +148,10 @@ std::expected<void, std::string> GUI::getAction(std::unique_ptr<Graph>& graph) {
         for (int node : result) std::cout << node << " ";
         std::cout << "\n";
     }
-    else if (command == "Help") {
+    else if (input == "Help") {
         HELP::Action(nullptr);
     }
-    else if (command == "Quit") {
+    else if (input == "Quit") {
         return std::unexpected("quit");
     }
     else {

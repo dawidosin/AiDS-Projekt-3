@@ -23,5 +23,5 @@ public:
     std::vector<int> tarjanTopologicalSort() const;
 
     static std::unique_ptr<Graph> createGraph(const Type type, int nodes, const std::vector<std::vector<int>>& adj);
-    static std::unique_ptr<Graph> generateDAG(int nodes, int saturation, Type type = Type::list);
+    static std::unique_ptr<Graph> generateDAG(int nodes, int saturation, Type type);
 };

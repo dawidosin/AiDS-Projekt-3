@@ -2,6 +2,7 @@
 #include "adjacencymatrix.h"
 #include "adjacencylist.h"
 #include "edgelist.h"
+
 #include <queue>
 #include <expected>
 #include <algorithm>
@@ -127,7 +128,6 @@ std::unique_ptr<Graph> Graph::generateDAG(int nodes, int saturation, Type type) 
         graph->addEdge(allPossibleEdges[i].first, allPossibleEdges[i].second);
     }
 
-    // Ensure at least one edge exists if saturation > 0
     if (targetEdges > 0 && graph->getEdges().empty()) {
         graph->addEdge(0, 1);
     }
