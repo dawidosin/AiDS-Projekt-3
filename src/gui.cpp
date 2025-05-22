@@ -45,8 +45,8 @@ std::expected<std::unique_ptr<Graph>, std::string> GUI::getGenerate() {
     }
     
     std::cout << "nodes> ";
-    if (!(std::cin >> nodes) || nodes < 1 || nodes > 100) {
-        return std::unexpected("Invalid node count. Must be between 1-100.");
+    if (!(std::cin >> nodes) || nodes < 1 || nodes > 10000) {
+        return std::unexpected("Invalid node count. Must be between 1-10000.");
     }
 
     std::cout << "saturation> ";

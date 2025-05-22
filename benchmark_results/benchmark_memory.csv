@@ -1,0 +1,10 @@
+graph_type,size,operation,memory
+table,100,find,3684
+table,100,toposort kahn,3776
+table,100,toposort tarjan,3856
+list,100,find,3672
+list,100,toposort kahn,3688
+list,100,toposort tarjan,3896
+matrix,100,find,3680
+matrix,100,toposort kahn,3728
+matrix,100,toposort tarjan,3860

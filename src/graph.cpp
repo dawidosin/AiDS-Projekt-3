@@ -6,6 +6,7 @@
 #include <queue>
 #include <expected>
 #include <algorithm>
+#include <random>
 
 std::unique_ptr<Graph> Graph::createGraph(const Type type, int nodes, const std::vector<std::vector<int>>& adj) {
     std::unique_ptr<Graph> graph;
@@ -90,9 +91,7 @@ std::vector<int> Graph::tarjanTopologicalSort() const {
 
 std::unique_ptr<Graph> Graph::generateDAG(int nodes, int saturation, Type type) {
     if (nodes < 1) throw std::invalid_argument("Number of nodes must be positive");
-    if (saturation < 0 || saturation > 100) {
-        throw std::invalid_argument("Saturation must be between 0 and 100");
-    }
+    if (saturation < 0 || saturation > 100) throw std::invalid_argument("Saturation must be between 0 and 100");
 
     std::unique_ptr<Graph> graph;
     switch (type) {
@@ -109,36 +108,27 @@ std::unique_ptr<Graph> Graph::generateDAG(int nodes, int saturation, Type type) 
             throw std::invalid_argument("Unsupported graph type");
     }
 
-    int maxPossibleEdges = nodes * (nodes - 1) / 2;
-    int targetEdges = maxPossibleEdges * saturation / 100;
+    // Oblicz maksymalną liczbę krawędzi w DAG (górny trójkąt bez przekątnej)
+    int maxEdges = nodes * (nodes - 1) / 2;
+    int targetEdges = maxEdges * saturation / 100;
 
-    // Generate edges in the upper triangle of the adjacency matrix
-    // We'll fill them row by row to ensure acyclic property
-    int edgesAdded = 0;
-    for (int i = 0; i < nodes && edgesAdded < targetEdges; ++i) {
-        int remainingNodes = nodes - i - 1;
-        int remainingEdges = targetEdges - edgesAdded;
-        
-        int edgesFromNode = std::min(remainingNodes, remainingEdges);
-        
-        if (saturation < 100 && edgesFromNode < remainingNodes) {
-            double probability = static_cast<double>(remainingEdges) / (remainingNodes * (nodes - i - 1)) * 2;
-            for (int j = i + 1; j < nodes && edgesAdded < targetEdges; ++j) {
-                if ((rand() / static_cast<double>(RAND_MAX)) < probability) {
-                    graph->addEdge(i, j);
-                    edgesAdded++;
-                }
-            }
-        } else {
-            for (int j = i + 1; j < nodes && edgesAdded < targetEdges; ++j) {
-                graph->addEdge(i, j);
-                edgesAdded++;
-            }
+    // Zbierz wszystkie możliwe pozycje (i, j) z górnego trójkąta (i < j)
+    std::vector<std::pair<int, int>> possibleEdges;
+    for (int i = 0; i < nodes; ++i) {
+        for (int j = i + 1; j < nodes; ++j) {
+            possibleEdges.emplace_back(i, j);
         }
     }
 
-    if (targetEdges > 0 && edgesAdded == 0) {
-        graph->addEdge(0, std::min(1, nodes-1));
+    // Wylosuj targetEdges z górnego trójkąta
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(possibleEdges.begin(), possibleEdges.end(), g);
+
+    for (int i = 0; i < targetEdges && i < possibleEdges.size(); ++i) {
+        int from = possibleEdges[i].first;
+        int to = possibleEdges[i].second;
+        graph->addEdge(from, to);
     }
 
     return graph;

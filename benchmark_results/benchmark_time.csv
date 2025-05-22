@@ -1,0 +1,10 @@
+graph_type,size,operation,time
+table,100,find,0.03992050
+table,100,toposort kahn,0.04104990
+table,100,toposort tarjan,0.03932170
+list,100,find,0.03684000
+list,100,toposort kahn,0.03963090
+list,100,toposort tarjan,0.03847350
+matrix,100,find,0.03914830
+matrix,100,toposort kahn,0.04175350
+matrix,100,toposort tarjan,0.03939320
