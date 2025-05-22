@@ -6,7 +6,6 @@
 #include <queue>
 #include <expected>
 #include <algorithm>
-#include <random>
 
 std::unique_ptr<Graph> Graph::createGraph(const Type type, int nodes, const std::vector<std::vector<int>>& adj) {
     std::unique_ptr<Graph> graph;
@@ -113,23 +112,33 @@ std::unique_ptr<Graph> Graph::generateDAG(int nodes, int saturation, Type type) 
     int maxPossibleEdges = nodes * (nodes - 1) / 2;
     int targetEdges = maxPossibleEdges * saturation / 100;
 
-    std::vector<std::pair<int, int>> allPossibleEdges;
-    for (int i = 0; i < nodes; ++i) {
-        for (int j = i + 1; j < nodes; ++j) {
-            allPossibleEdges.emplace_back(i, j);
+    // Generate edges in the upper triangle of the adjacency matrix
+    // We'll fill them row by row to ensure acyclic property
+    int edgesAdded = 0;
+    for (int i = 0; i < nodes && edgesAdded < targetEdges; ++i) {
+        int remainingNodes = nodes - i - 1;
+        int remainingEdges = targetEdges - edgesAdded;
+        
+        int edgesFromNode = std::min(remainingNodes, remainingEdges);
+        
+        if (saturation < 100 && edgesFromNode < remainingNodes) {
+            double probability = static_cast<double>(remainingEdges) / (remainingNodes * (nodes - i - 1)) * 2;
+            for (int j = i + 1; j < nodes && edgesAdded < targetEdges; ++j) {
+                if ((rand() / static_cast<double>(RAND_MAX)) < probability) {
+                    graph->addEdge(i, j);
+                    edgesAdded++;
+                }
+            }
+        } else {
+            for (int j = i + 1; j < nodes && edgesAdded < targetEdges; ++j) {
+                graph->addEdge(i, j);
+                edgesAdded++;
+            }
         }
     }
 
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(allPossibleEdges.begin(), allPossibleEdges.end(), g);
-
-    for (int i = 0; i < std::min(static_cast<int>(allPossibleEdges.size()), targetEdges); ++i) {
-        graph->addEdge(allPossibleEdges[i].first, allPossibleEdges[i].second);
-    }
-
-    if (targetEdges > 0 && graph->getEdges().empty()) {
-        graph->addEdge(0, 1);
+    if (targetEdges > 0 && edgesAdded == 0) {
+        graph->addEdge(0, std::min(1, nodes-1));
     }
 
     return graph;

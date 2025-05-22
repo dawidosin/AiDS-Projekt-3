@@ -41,6 +41,9 @@ int main(int argc, char* argv[]) {
             if (result.error() == "quit") {
                 break;
             }
+            else if (result.error() == "heredoc") {
+                break;
+            }
             std::cerr << "Error: " << result.error() << std::endl;
         }
     }

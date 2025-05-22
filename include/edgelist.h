@@ -17,8 +17,8 @@ private:
 public:
     EdgeList(int nodes);
 
-    void addEdge(int from, int to) override;
     void print() const override;
+    void addEdge(int from, int to) override;
     bool hasEdge(int from, int to) const override;
     std::vector<int> bfs(int start) const override;
     std::vector<int> dfs(int start) const override;

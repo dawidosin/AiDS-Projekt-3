@@ -21,13 +21,13 @@ void HELP::Generate(char* argv[]) {
 
 void HELP::Action(char* argv[]) {
     std::cerr << "\nAvailable Actions:\n";
-    std::cerr << "  Print               - Print graph structure\n";
-    std::cerr << "  BFS <node>          - Breadth-First Search from node\n";
-    std::cerr << "  DFS <node>          - Depth-First Search from node\n";
-    std::cerr << "  Find <from> <to>    - Check if edge exists\n";
-    std::cerr << "  TopoSort [kahn|tarjan] - Topological sort\n";
-    std::cerr << "  Help                - Show this help\n";
-    std::cerr << "  Quit                - Exit program\n";
+    std::cerr << "  print               - Print graph structure\n";
+    std::cerr << "  bfs <node>          - Breadth-First Search from node\n";
+    std::cerr << "  dfs <node>          - Depth-First Search from node\n";
+    std::cerr << "  find   - Check if edge exists\n";
+    std::cerr << "  toposort [kahn|tarjan] - Topological sort\n";
+    std::cerr << "  help                - Show this help\n";
+    std::cerr << "  quit                - Exit program\n";
 }
 
 std::expected<std::unique_ptr<Graph>, std::string> GUI::getGenerate() {
@@ -92,16 +92,20 @@ std::expected<std::unique_ptr<Graph>, std::string> GUI::getUserProvided() {
 std::expected<void, std::string> GUI::getAction(std::unique_ptr<Graph>& graph) {
     std::string input;
     std::cout << "action> ";
-    std::getline(std::cin >> std::ws, input);
+
+    // in case of using "heredoc" input
+    if (!std::getline(std::cin >> std::ws, input)) {
+        return std::unexpected("heredoc");
+    }
     
     std::istringstream iss(input);
     std::string command;
     iss >> command;
 
-    if (input == "Print") {
+    if (command == "print") {
         graph->print();
     }
-    else if (input == "Breath-first search") {
+    else if (command == "bfs") {
         int start;
         if (!(iss >> start)) {
             return std::unexpected("Missing start node for BFS");
@@ -111,7 +115,7 @@ std::expected<void, std::string> GUI::getAction(std::unique_ptr<Graph>& graph) {
         for (int node : result) std::cout << node << " ";
         std::cout << "\n";
     }
-    else if (input == "Depth-first search") {
+    else if (command == "dfs") {
         int start;
         if (!(iss >> start)) {
             return std::unexpected("Missing start node for DFS");
@@ -121,15 +125,26 @@ std::expected<void, std::string> GUI::getAction(std::unique_ptr<Graph>& graph) {
         for (int node : result) std::cout << node << " ";
         std::cout << "\n";
     }
-    else if (input == "Find") {
+    else if (command == "find") {
         int from, to;
-        if (!(iss >> from >> to)) {
-            return std::unexpected("Missing nodes for Find");
+        std::cout << "from> ";
+        if (!(std::cin >> from)) {
+            return std::unexpected("Missing nodes for Find (from)");
+        }   
+
+        std::cout << "to> ";
+        if (!(std::cin >> to)) {
+            return std::unexpected("Missing nodes for Find (to)");
         }
-        std::cout << "Edge " << from << "->" << to << " " 
-                  << (graph->hasEdge(from, to) ? "exists" : "does not exist") << "\n";
+
+        if (graph->hasEdge(from, to)) {
+            std::cout << "True: edge ("<< from << "," << to << ") exists in the Graph!";
+        }
+        else {
+            std::cout << "False: edge (" << from << "," << to << ") does not exist in the Graph!";
+        }
     }
-    else if (input == "TopoSort") {
+    else if (command == "toposort") {
         std::string method;
         iss >> method;
         std::vector<int> result;
@@ -148,10 +163,10 @@ std::expected<void, std::string> GUI::getAction(std::unique_ptr<Graph>& graph) {
         for (int node : result) std::cout << node << " ";
         std::cout << "\n";
     }
-    else if (input == "Help") {
+    else if (command == "help") {
         HELP::Action(nullptr);
     }
-    else if (input == "Quit") {
+    else if (command == "quit") {
         return std::unexpected("quit");
     }
     else {
