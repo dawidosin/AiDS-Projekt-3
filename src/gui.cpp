@@ -15,7 +15,7 @@ void HELP::Modes(char* argv[]) {
 
 void HELP::Generate(char* argv[]) {
     std::cerr << "\nGraph Generation Parameters:\n";
-    std::cerr << "  nodes>       Number of nodes (1-100)\n";
+    std::cerr << "  nodes>       Number of nodes (1-10000)\n";
     std::cerr << "  saturation>  Edge saturation percentage (1-100)\n";
 }
 
@@ -45,7 +45,7 @@ std::expected<std::unique_ptr<Graph>, std::string> GUI::getGenerate() {
     }
     
     std::cout << "nodes> ";
-    if (!(std::cin >> nodes) || nodes < 1 || nodes > 10000) {
+    if (!(std::cin >> nodes) || nodes < 1 || nodes > 10000) {   
         return std::unexpected("Invalid node count. Must be between 1-10000.");
     }
 
