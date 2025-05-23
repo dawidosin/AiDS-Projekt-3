@@ -14,6 +14,7 @@ add_executable(program
     src/edgelist.cpp
     src/graph.cpp
     src/gui.cpp
+    src/algorithms.cpp
 )
 
 # Use C++23 features

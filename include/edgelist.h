@@ -15,7 +15,7 @@ private:
     int nodeCount;
 
 public:
-    EdgeList(int nodes);
+    explicit EdgeList(int nodes);
 
     void print() const override;
     void addEdge(int from, int to) override;

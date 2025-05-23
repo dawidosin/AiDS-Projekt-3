@@ -1,4 +1,5 @@
 #include "adjacencymatrix.h"
+#include "algorithms.h"
 
 AdjacencyMatrix::AdjacencyMatrix(int nodes)
     : nodeCount(nodes), matrix(nodes, std::vector<bool>(nodes, false)) {}
@@ -34,55 +35,13 @@ bool AdjacencyMatrix::hasEdge(int from, int to) const {
 }
 
 std::vector<int> AdjacencyMatrix::bfs(int start) const {
-    std::vector<int> result;
-    if (start < 0 || start >= nodeCount) return result;
-
-    std::vector<bool> visited(nodeCount, false);
-    std::queue<int> q;
-    q.push(start);
-    visited[start] = true;
-
-    while (!q.empty()) {
-        int current = q.front();
-        q.pop();
-        result.push_back(current);
-
-        for (int neighbor = 0; neighbor < nodeCount; ++neighbor) {
-            if (matrix[current][neighbor] && !visited[neighbor]) {
-                visited[neighbor] = true;
-                q.push(neighbor);
-            }
-        }
-    }
-
-    return result;
+    return ::bfs(start, nodeCount, [this](int node) { return this->getNeighbors(node); });
 }
 
 std::vector<int> AdjacencyMatrix::dfs(int start) const {
-    std::vector<int> result;
-    if (start < 0 || start >= nodeCount) return result;
-
-    std::vector<bool> visited(nodeCount, false);
-    std::stack<int> s;
-    s.push(start);
-
-    while (!s.empty()) {
-        int current = s.top();
-        s.pop();
-
-        if (visited[current]) continue;
-        visited[current] = true;
-        result.push_back(current);
-
-        for (int neighbor = nodeCount - 1; neighbor >= 0; --neighbor) {
-            if (matrix[current][neighbor] && !visited[neighbor]) {
-                s.push(neighbor);
-            }
-        }
-    }
-
-    return result;
+    return ::dfs(start, nodeCount, [this](int node) { return this->getNeighbors(node); });
 }
+
 
 std::vector<int> AdjacencyMatrix::getNeighbors(int node) const {
     std::vector<int> neighbors;

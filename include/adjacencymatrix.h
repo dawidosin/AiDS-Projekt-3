@@ -13,10 +13,10 @@ private:
     int nodeCount;
 
 public:
-    AdjacencyMatrix(int nodes);
+    explicit AdjacencyMatrix(int nodes);
 
     void print() const override;
-    void addEdge(int from, int to);
+    void addEdge(int from, int to) override;
     bool hasEdge(int from, int to) const override;
     std::vector<int> bfs(int start) const override;
     std::vector<int> dfs(int start) const override;

@@ -7,6 +7,7 @@
 #include <expected>
 #include <algorithm>
 #include <random>
+#include <functional>
 
 std::unique_ptr<Graph> Graph::createGraph(const Type type, int nodes, const std::vector<std::vector<int>>& adj) {
     std::unique_ptr<Graph> graph;

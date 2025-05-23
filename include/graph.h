@@ -7,7 +7,7 @@
 
 class Graph {
 public:
-    enum Type {matrix, list, table};
+    enum class Type {matrix, list, table};
 
     virtual ~Graph() = default;
     virtual void print() const = 0;
